@@ -2,16 +2,16 @@
 	"node": "@goperigon/n8n-nodes-perigon",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
-	"categories": ["Development", "Developer Tools"],
+	"categories": ["Development", "Developer Tools", "AI", "Contextual Intelligence"],
 	"resources": {
 		"credentialDocumentation": [
 			{
-				"url": "https://github.com/org/repo?tab=readme-ov-file#credentials"
+				"url": "https://www.perigon.io/docs/authentication"
 			}
 		],
 		"primaryDocumentation": [
 			{
-				"url": "https://github.com/org/repo?tab=readme-ov-file"
+				"url": "https://www.perigon.io/docs"
 			}
 		]
 	}

@@ -1,0 +1,18 @@
+{
+    "node": "@goperigon/n8n-nodes-perigon",
+    "nodeVersion": "1.0",
+    "codexVersion": "1.0",
+    "categories": ["Development", "Developer Tools", "AI", "Contextual Intelligence"],
+    "resources": {
+        "credentialDocumentation": [
+            {
+                "url": "https://www.perigon.io/docs/authentication"
+            }
+        ],
+        "primaryDocumentation": [
+            {
+                "url": "https://www.perigon.io/docs"
+            }
+        ]
+    }
+}

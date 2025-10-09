@@ -5,10 +5,10 @@ import type {
 	INodeProperties,
 } from 'n8n-workflow';
 
-export class GoperigonPerigonApi implements ICredentialType {
-	name = 'goperigonPerigonApi';
+export class PerigonApi implements ICredentialType {
+	name = 'perigonApi';
 
-	displayName = 'Goperigon Perigon API';
+	displayName = 'Perigon API';
 
 	// Link to your community node's README
 	documentationUrl = 'https://github.com/org/@goperigon/-perigon?tab=readme-ov-file#credentials';
@@ -36,7 +36,7 @@ export class GoperigonPerigonApi implements ICredentialType {
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: 'https://api.perigon.io/v1',
-			url: '/v1/user',
+			url: '/all',
 		},
 	};
 }
