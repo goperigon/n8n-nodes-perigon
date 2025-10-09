@@ -32,7 +32,7 @@ export const articlesVectorSearchDescription: INodeProperties[] = [
 		},
 		typeOptions: {
 			minValue: 1,
-			maxValue: 100,
+			maxValue: 1000,
 		},
 		default: 10,
 		description: 'Number of results to return',

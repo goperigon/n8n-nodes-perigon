@@ -7,19 +7,19 @@ const showOnlyForWikipediaVectorSearch = {
 
 export const wikipediaVectorSearchDescription: INodeProperties[] = [
 	{
-		displayName: 'Query',
-		name: 'query',
+		displayName: 'Prompt',
+		name: 'prompt',
 		type: 'string',
 		displayOptions: {
 			show: showOnlyForWikipediaVectorSearch,
 		},
 		default: '',
 		required: true,
-		description: 'Natural language query for semantic search of Wikipedia articles',
+		description: 'Natural language prompt for semantic search of Wikipedia articles',
 		routing: {
 			send: {
 				type: 'body',
-				property: 'query',
+				property: 'prompt',
 			},
 		},
 	},
@@ -32,7 +32,7 @@ export const wikipediaVectorSearchDescription: INodeProperties[] = [
 		},
 		typeOptions: {
 			minValue: 1,
-			maxValue: 100,
+			maxValue: 1000,
 		},
 		default: 10,
 		description: 'Number of results to return',
@@ -44,10 +44,121 @@ export const wikipediaVectorSearchDescription: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Additional Filters',
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: showOnlyForWikipediaVectorSearch,
+		},
+		typeOptions: {
+			minValue: 0,
+		},
+		default: 0,
+		description: 'Page number for pagination (0-based)',
+		routing: {
+			send: {
+				type: 'body',
+				property: 'page',
+			},
+		},
+	},
+	{
+		displayName: 'Score Threshold',
+		name: 'scoreThreshold',
+		type: 'number',
+		displayOptions: {
+			show: showOnlyForWikipediaVectorSearch,
+		},
+		typeOptions: {
+			minValue: 0,
+			maxValue: 1,
+			numberPrecision: 2,
+		},
+		default: 0,
+		description: 'Minimum similarity score threshold (0-1). Leave at 0 to disable.',
+		routing: {
+			send: {
+				type: 'body',
+				property: 'scoreThreshold',
+				value: '={{ $value > 0 ? $value : undefined }}',
+			},
+		},
+	},
+	{
+		displayName: 'Wiki Revision From',
+		name: 'wikiRevisionFrom',
+		type: 'string',
+		displayOptions: {
+			show: showOnlyForWikipediaVectorSearch,
+		},
+		default: '',
+		placeholder: '2024-03-28',
+		description: 'Filter for Wikipedia revisions from this date (YYYY-MM-DD)',
+		routing: {
+			send: {
+				type: 'body',
+				property: 'wikiRevisionFrom',
+				value: '={{ $value ? $value : undefined }}',
+			},
+		},
+	},
+	{
+		displayName: 'Wiki Revision To',
+		name: 'wikiRevisionTo',
+		type: 'string',
+		displayOptions: {
+			show: showOnlyForWikipediaVectorSearch,
+		},
+		default: '',
+		placeholder: '2030-01-01',
+		description: 'Filter for Wikipedia revisions up to this date (YYYY-MM-DD)',
+		routing: {
+			send: {
+				type: 'body',
+				property: 'wikiRevisionTo',
+				value: '={{ $value ? $value : undefined }}',
+			},
+		},
+	},
+	{
+		displayName: 'Page Views From',
+		name: 'pageviewsFrom',
+		type: 'number',
+		displayOptions: {
+			show: showOnlyForWikipediaVectorSearch,
+		},
+		default: 0,
+		description: 'Minimum average daily page views. Leave at 0 to disable.',
+		routing: {
+			send: {
+				type: 'body',
+				property: 'pageviewsFrom',
+				value: '={{ $value > 0 ? $value : undefined }}',
+			},
+		},
+	},
+	{
+		displayName: 'Page Views To',
+		name: 'pageviewsTo',
+		type: 'number',
+		displayOptions: {
+			show: showOnlyForWikipediaVectorSearch,
+		},
+		default: 0,
+		description: 'Maximum average daily page views. Leave at 0 to disable.',
+		routing: {
+			send: {
+				type: 'body',
+				property: 'pageviewsTo',
+				value: '={{ $value > 0 ? $value : undefined }}',
+			},
+		},
+	},
+	{
+		displayName: 'Filters',
 		name: 'filters',
-		placeholder: 'Add Filter',
 		type: 'fixedCollection',
+		placeholder: 'Add Filter',
 		displayOptions: {
 			show: showOnlyForWikipediaVectorSearch,
 		},
@@ -57,92 +168,140 @@ export const wikipediaVectorSearchDescription: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'filterOptions',
+				name: 'filterValues',
 				displayName: 'Filter Options',
 				values: [
 					{
-						displayName: 'Categories',
-						name: 'category',
-						type: 'string',
-						default: '',
-						placeholder: 'Science,History,Technology',
-						description: 'Comma-separated list of Wikipedia categories',
-					},
-					{
-						displayName: 'Maximum Page Views',
-						name: 'pageviewsTo',
+						displayName: 'Page ID',
+						name: 'pageId',
 						type: 'number',
-						default: '',
-						description: 'Maximum average daily page views',
+						default: 0,
+						description: 'Filter by specific page ID',
+						routing: {
+							send: {
+								type: 'body',
+								property: 'filter.pageId',
+								value: '={{ $value > 0 ? $value : undefined }}',
+							},
+						},
 					},
 					{
-						displayName: 'Minimum Page Views',
-						name: 'pageviewsFrom',
+						displayName: 'Section ID',
+						name: 'sectionId',
 						type: 'number',
-						default: '',
-						description: 'Minimum average daily page views',
+						default: 0,
+						description: 'Filter by specific section ID',
+						routing: {
+							send: {
+								type: 'body',
+								property: 'filter.sectionId',
+								value: '={{ $value > 0 ? $value : undefined }}',
+							},
+						},
 					},
 					{
-						displayName: 'Sort By',
-						name: 'sortBy',
-						type: 'options',
-						options: [
-							{
-								name: 'Relevance',
-								value: 'relevance',
-							},
-							{
-								name: 'Created At',
-								value: 'createdAt',
-							},
-							{
-								name: 'Updated At',
-								value: 'updatedAt',
-							},
-						],
-						default: 'relevance',
-						description: 'Sort order for results',
-					},
-					{
-						displayName: 'Wiki Codes',
+						displayName: 'Wiki Code',
 						name: 'wikiCode',
 						type: 'string',
-						default: 'enwiki',
+						default: '',
 						placeholder: 'enwiki',
-						description: 'Wiki project codes (currently only enwiki is supported)',
+						description: 'Wiki project code (currently only enwiki is supported)',
+						routing: {
+							send: {
+								type: 'body',
+								property: 'filter.wikiCode',
+								value: '={{ $value ? $value : undefined }}',
+							},
+						},
 					},
 					{
-						displayName: 'Wikidata IDs',
+						displayName: 'Wiki Namespace',
+						name: 'wikiNamespace',
+						type: 'number',
+						default: 0,
+						description: 'Filter by wiki namespace',
+						routing: {
+							send: {
+								type: 'body',
+								property: 'filter.wikiNamespace',
+								value: '={{ $value !== 0 ? $value : undefined }}',
+							},
+						},
+					},
+					{
+						displayName: 'Wiki Page ID',
+						name: 'wikiPageId',
+						type: 'number',
+						default: 0,
+						description: 'Filter by specific wiki page ID',
+						routing: {
+							send: {
+								type: 'body',
+								property: 'filter.wikiPageId',
+								value: '={{ $value > 0 ? $value : undefined }}',
+							},
+						},
+					},
+					{
+						displayName: 'Wiki Revision ID',
+						name: 'wikiRevisionId',
+						type: 'number',
+						default: 0,
+						description: 'Filter by specific wiki revision ID',
+						routing: {
+							send: {
+								type: 'body',
+								property: 'filter.wikiRevisionId',
+								value: '={{ $value > 0 ? $value : undefined }}',
+							},
+						},
+					},
+					{
+						displayName: 'Wikidata ID',
 						name: 'wikidataId',
 						type: 'string',
 						default: '',
-						placeholder: 'Q7747,Q937',
-						description: 'Comma-separated list of Wikidata entity IDs',
+						placeholder: 'Q7747',
+						description: 'Filter by specific Wikidata entity ID',
+						routing: {
+							send: {
+								type: 'body',
+								property: 'filter.wikidataId',
+								value: '={{ $value ? $value : undefined }}',
+							},
+						},
 					},
 					{
-						displayName: 'Wikidata Instance Of IDs',
+						displayName: 'Wikidata Instance Of ID',
 						name: 'wikidataInstanceOfId',
 						type: 'string',
 						default: '',
-						placeholder: 'Q5,Q43229',
-						description: 'Filter pages whose Wikidata entities are instances of these IDs',
+						placeholder: 'Q5',
+						description: 'Filter pages whose Wikidata entities are instances of this ID',
+						routing: {
+							send: {
+								type: 'body',
+								property: 'filter.wikidataInstanceOfId',
+								value: '={{ $value ? $value : undefined }}',
+							},
+						},
 					},
 					{
-						displayName: 'Wikidata Instance Of Labels',
+						displayName: 'Wikidata Instance Of Label',
 						name: 'wikidataInstanceOfLabel',
 						type: 'string',
 						default: '',
-						placeholder: 'human,organization',
-						description: 'Filter pages whose Wikidata entities are instances of these labels',
+						placeholder: 'human',
+						description: 'Filter pages whose Wikidata entities are instances of this label',
+						routing: {
+							send: {
+								type: 'body',
+								property: 'filter.wikidataInstanceOfLabel',
+								value: '={{ $value ? $value : undefined }}',
+							},
+						},
 					},
-					{
-						displayName: 'With Page Views',
-						name: 'withPageviews',
-						type: 'boolean',
-						default: false,
-						description: 'Whether to include only pages with viewership statistics',
-					},
-			],
+				],
 			},
 		],
 	},
