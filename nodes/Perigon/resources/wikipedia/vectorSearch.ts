@@ -305,4 +305,74 @@ export const wikipediaVectorSearchDescription: INodeProperties[] = [
 			},
 		],
 	},
+	{
+		displayName: 'Advanced Filters',
+		name: 'advancedFilters',
+		type: 'fixedCollection',
+		placeholder: 'Add Advanced Filter',
+		displayOptions: {
+			show: showOnlyForWikipediaVectorSearch,
+		},
+		default: {},
+		typeOptions: {
+			multipleValues: false,
+		},
+		description: 'Advanced filter logic with AND/OR/NOT operators',
+		options: [
+			{
+				name: 'advancedFilterValues',
+				displayName: 'Advanced Filter Options',
+				values: [
+					{
+						displayName: 'AND',
+						name: 'AND',
+						type: 'json',
+						default: '',
+						placeholder: '[{"wikiCode": "enwiki"}, {"wikidataInstanceOfLabel": "human"}]',
+						description:
+							'AND logic - all conditions must match. Provide as JSON array. Example: [{"wikiCode": "enwiki"}, {"pageviewsFrom": 100}]',
+						routing: {
+							send: {
+								type: 'body',
+								property: 'filter.AND',
+								value: '={{ $value ? JSON.parse($value) : undefined }}',
+							},
+						},
+					},
+					{
+						displayName: 'OR',
+						name: 'OR',
+						type: 'json',
+						default: '',
+						placeholder: '[{"wikidataId": "Q7747"}, {"wikidataId": "Q937"}]',
+						description:
+							'OR logic - at least one condition must match. Provide as JSON array. Example: [{"wikidataId": "Q7747"}, {"wikidataId": "Q937"}]',
+						routing: {
+							send: {
+								type: 'body',
+								property: 'filter.OR',
+								value: '={{ $value ? JSON.parse($value) : undefined }}',
+							},
+						},
+					},
+					{
+						displayName: 'NOT',
+						name: 'NOT',
+						type: 'json',
+						default: '',
+						placeholder: '{"wikiNamespace": 1}',
+						description:
+							'NOT logic - excludes matching pages. Provide as JSON object or array. Example: {"wikiNamespace": 1} or [{"wikiNamespace": 1}]',
+						routing: {
+							send: {
+								type: 'body',
+								property: 'filter.NOT',
+								value: '={{ $value ? JSON.parse($value) : undefined }}',
+							},
+						},
+					},
+				],
+			},
+		],
+	},
 ];
