@@ -1,5 +1,6 @@
 import type { INodeProperties } from 'n8n-workflow';
 import { wikipediaVectorSearchDescription } from './vectorSearch';
+import { wikipediaSearchDescription } from './search';
 
 const showOnlyForWikipedia = {
 	resource: ['wikipedia'],
@@ -17,11 +18,23 @@ export const wikipediaDescription: INodeProperties[] = [
 		},
 		options: [
 			{
+				name: 'Search',
+				value: 'search',
+				action: 'Search wikipedia using keywords',
+				description: 'Search Wikipedia articles using keyword queries with Boolean operators',
+				routing: {
+					request: {
+						method: 'GET',
+						url: '/wikipedia/all',
+					},
+				},
+			},
+			{
 				name: 'Vector Search',
 				value: 'vectorSearch',
 				action: 'Search wikipedia using vector similarity',
 				description:
-					'Search Wikipedia articles using semantic similarity with natural language queries',
+					'Search Wikipedia articles using semantic similarity with natural language queries (best for LLM workflows)',
 				routing: {
 					request: {
 						method: 'POST',
@@ -30,7 +43,8 @@ export const wikipediaDescription: INodeProperties[] = [
 				},
 			},
 		],
-		default: 'vectorSearch',
+		default: 'search',
 	},
+	...wikipediaSearchDescription,
 	...wikipediaVectorSearchDescription,
 ];

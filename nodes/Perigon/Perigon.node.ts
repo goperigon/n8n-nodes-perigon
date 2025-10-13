@@ -1,6 +1,13 @@
 import { NodeConnectionTypes, type INodeType, type INodeTypeDescription } from 'n8n-workflow';
 import { articlesDescription } from './resources/articles';
 import { wikipediaDescription } from './resources/wikipedia';
+import { storiesDescription } from './resources/stories';
+import { peopleDescription } from './resources/people';
+import { sourcesDescription } from './resources/sources';
+import { journalistsDescription } from './resources/journalists';
+import { companiesDescription } from './resources/companies';
+import { topicsDescription } from './resources/topics';
+import { summarizeDescription } from './resources/summarize';
 
 export class Perigon implements INodeType {
 	description: INodeTypeDescription = {
@@ -35,16 +42,60 @@ export class Perigon implements INodeType {
 					{
 						name: 'Article',
 						value: 'articles',
+						description: 'Search and filter news articles',
+					},
+					{
+						name: 'Company',
+						value: 'companies',
+						description: 'Search for companies in the Perigon database',
+					},
+					{
+						name: 'Journalist',
+						value: 'journalists',
+						description: 'Search journalists and reporters',
+					},
+					{
+						name: 'Person',
+						value: 'people',
+						description: 'Search for public figures and newsworthy individuals',
+					},
+					{
+						name: 'Source',
+						value: 'sources',
+						description: 'Search media sources and publications',
+					},
+					{
+						name: 'Story',
+						value: 'stories',
+						description: 'Track evolving narratives and news story clusters',
+					},
+					{
+						name: 'Summarize',
+						value: 'summarize',
+						description: 'Generate AI-powered summaries of search results',
+					},
+					{
+						name: 'Topic',
+						value: 'topics',
+						description: 'Browse available topics',
 					},
 					{
 						name: 'Wikipedia',
 						value: 'wikipedia',
+						description: 'Search Wikipedia articles',
 					},
 				],
 				default: 'articles',
 			},
 			...articlesDescription,
+			...storiesDescription,
+			...peopleDescription,
+			...sourcesDescription,
+			...journalistsDescription,
+			...companiesDescription,
+			...topicsDescription,
 			...wikipediaDescription,
+			...summarizeDescription,
 		],
 	};
 }
