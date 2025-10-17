@@ -10,14 +10,10 @@ Follow these steps to install this node in your n8n instance:
 
 1. Go to **Settings > Community Nodes**
 2. Select **Install Another Node**
-3. Enter `@goperigon/n8n-nodes-perigon`
+3. Enter `n8n-nodes-perigon`
 4. Click **Install**
 
 Alternatively, you can install it using npm:
-
-```bash
-npm install @goperigon/n8n-nodes-perigon
-```
 
 ## Credentials
 
