@@ -1,9 +1,9 @@
 {
 	"name": "@goperigon/n8n-nodes-perigon",
 	"version": "0.1.0",
-	"description": "n8n community node to work with the Example API",
+	"description": "Official n8n community node for the Perigon API - Access AI-powered news articles, stories, companies, people, journalists, sources, topics, Wikipedia data, and AI-powered summarization",
 	"license": "MIT",
-	"homepage": "https://example.com",
+	"homepage": "https://www.perigon.io",
 	"keywords": [
 		"n8n-community-node-package"
 	],
@@ -13,7 +13,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": ""
+		"url": "https://github.com/goperigon/n8n-nodes-perigon"
 	},
 	"scripts": {
 		"build": "n8n-node build",

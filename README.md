@@ -1,8 +1,10 @@
 # n8n-nodes-perigon
 
-This is the official n8n community node for interacting with the Perigon API. It provides comprehensive access to contextual intelligent APIs including vector articles search, news articles, stories, people, companies, journalists, sources, topics, Wikipedia data, and AI-powered summarization.
+This is the official n8n community node for the Perigon API. It provides comprehensive access to news intelligence APIs, including news articles, story clusters, companies, public figures, journalists, media sources, topics, Wikipedia data, and AI-powered summarization capabilities.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
+
+[Perigon](https://www.perigon.io/) provides contextual news intelligence APIs trusted by leading organizations for real-time news monitoring, media analysis, and AI-powered insights.
 
 ## Installation
 
@@ -10,29 +12,41 @@ Follow these steps to install this node in your n8n instance:
 
 1. Go to **Settings > Community Nodes**
 2. Select **Install Another Node**
-3. Enter `n8n-nodes-perigon`
+3. Enter `@goperigon/n8n-nodes-perigon`
 4. Click **Install**
 
-Alternatively, you can install it using npm.
+Alternatively, you can install it using npm:
+
+```bash
+npm install @goperigon/n8n-nodes-perigon
+```
 
 ## Documentation
 
-For complete documentation about the Perigon API and its capabilities, visit the [Docs](https://www.perigon.io/docs) or the [API Reference](https://www.perigon.io/reference) for more details.
+For complete documentation about the Perigon API and its capabilities, visit:
+
+- **[API Documentation](https://perigon.io/docs)** - Comprehensive guides and tutorials
+- **[API Reference](https://perigon.io/reference)** - Detailed endpoint documentation
+- **[Perigon Website](https://www.perigon.io/)** - Product information and use cases
 
 ## Credentials
 
-To use this node, you need a Perigon API key. You can get one by:
+To use this node, you need a Perigon API key.
 
-1. Going to [Perigon's website](https://www.perigon.io)
-2. Creating an account
-3. Getting your API key from the dashboard
+### Getting Your API Key
 
-Once you have your API key, add it to n8n:
+1. Visit [Perigon's website](https://www.perigon.io)
+2. Sign up for an account or log in
+3. Navigate to your dashboard to retrieve your API key
 
-1. Go to **Credentials > New Credential**
+### Adding Credentials to n8n
+
+1. In n8n, go to **Credentials > New Credential**
 2. Search for "Perigon API"
 3. Enter your API key
 4. Save the credential
+
+Your credentials will be securely stored and automatically used for all Perigon node operations.
 
 ## Resources and Operations
 
@@ -40,154 +54,254 @@ The Perigon node supports the following resources:
 
 ### 📰 Article
 
-Search and filter news articles from 140,000+ sources worldwide.
+Search and filter news articles from over 140,000 sources worldwide with comprehensive filtering capabilities.
 
 **Operations:**
 
-- **Search**: Search articles using keyword queries with Boolean operators (AND, OR, NOT)
-- **Vector Search**: Search articles using semantic similarity with natural language queries (ideal for LLM workflows)
+- **Search**: Keyword-based article search with advanced Boolean operators (AND, OR, NOT)
+- **Vector Search**: Semantic similarity search using natural language queries (optimized for AI and LLM workflows)
 
-**Key Parameters:**
+**Key Features:**
 
-- Query string with Boolean operator support
-- Category, country, language filters
-- Date range filtering (from/to)
-- Source domain filtering
-- Topic filtering
-- Content, title, description search
-- Sorting options (date, relevance, add date, refresh date)
-- Pagination support (up to 1000 results per page)
+- **Query Filtering**: Full Boolean operator support with exact phrase matching using quotes
+- **Content Filtering**: Search within article titles, descriptions, and full content
+- **Categorical Filtering**: Filter by categories (Tech, Business, Politics, etc.) and granular topics
+- **Geographic Filtering**: Filter by country, state, or city
+- **Temporal Filtering**: Date range filtering with `from` and `to` parameters
+- **Source Filtering**: Filter by specific publisher domains (supports wildcards)
+- **Language Support**: Multi-language article filtering
+- **Sorting Options**: Sort by date, relevance, publication date, refresh date, or add date
+- **Pagination**: Retrieve up to 1,000 results per page with 0-based pagination
+- **Result Count**: Optional total result count display
+
+**Common Use Cases:**
+
+- Real-time news monitoring and alerting
+- Media analysis and trend detection
+- Competitive intelligence gathering
+- Content aggregation for research
+- AI-powered news summarization pipelines
 
 ### 📚 Story
 
-Track evolving narratives and clustered news headlines.
+Track evolving news narratives through automatically clustered headlines from multiple sources.
 
 **Operations:**
 
-- **Search**: Find news story clusters to understand how narratives develop
+- **Search**: Discover and monitor story clusters to understand how news narratives develop over time
 
-**Key Parameters:**
+**Key Features:**
 
-- Query filtering for story names and summaries
-- Minimum cluster size and unique sources
-- Category, country, topic filtering
-- Date range filtering
-- Source filtering
-- Sort by count, created date, relevance, or total count
+- **Query Filtering**: Search within story names, summaries, and key points using Boolean operators
+- **Cluster Configuration**: Set minimum cluster size and required number of unique sources
+- **Categorical Filtering**: Filter by categories, countries, and topics
+- **Temporal Filtering**: Date range filtering to track story evolution
+- **Source Filtering**: Filter by specific publisher domains
+- **Sorting Options**: Sort by article count, creation date, relevance, total count, or last update
+- **Pagination**: Navigate through results with configurable page size
+- **Result Count**: Optional display of total matching stories
+
+**Common Use Cases:**
+
+- Breaking news monitoring and narrative tracking
+- Understanding media coverage patterns across sources
+- Crisis communications and reputation management
+- Competitive intelligence on industry developments
+- Research on how stories evolve in the media
 
 ### 🌐 Wikipedia
 
-Search Wikipedia articles with advanced filtering.
+Search and analyze Wikipedia articles with advanced filtering and semantic capabilities.
 
 **Operations:**
 
-- **Search**: Search Wikipedia using keyword queries with Boolean operators
-- **Vector Search**: Semantic search using natural language queries
+- **Search**: Keyword-based Wikipedia search with Boolean operators
+- **Vector Search**: Semantic similarity search using natural language queries
 
-**Key Parameters:**
+**Key Features:**
 
-- Query, title, summary, text, and reference searching
-- Category filtering
-- Wikidata entity ID filtering
-- Page view statistics filtering
-- Sort by relevance, creation date, or update date
+- **Multi-Field Search**: Search across article queries, titles, summaries, full text, and references
+- **Category Filtering**: Filter by Wikipedia categories
+- **Wikidata Integration**: Filter by Wikidata entity IDs and instance types
+- **Popularity Metrics**: Filter by page view statistics (minimum and maximum)
+- **Wiki Project Filtering**: Filter by wiki codes (currently supports English Wikipedia - `enwiki`)
+- **Sorting Options**: Sort by relevance, creation date, or last update date
+- **Pagination**: Navigate results with configurable page size
+- **Pageview Statistics**: Option to include only pages with viewership data
+
+**Common Use Cases:**
+
+- Knowledge base enrichment and fact-checking
+- Entity disambiguation and research
+- Background information gathering for news stories
+- Educational content creation
+- Semantic search for related topics and concepts
 
 ### 👤 Person
 
-Search for public figures, politicians, celebrities, and newsworthy individuals.
+Search for public figures, politicians, celebrities, business leaders, and other newsworthy individuals.
 
 **Operations:**
 
-- **Search**: Find people by name, occupation, or Wikidata ID
+- **Search**: Discover people by name, occupation, or unique identifiers
 
-**Key Parameters:**
+**Key Features:**
 
-- Name search with Boolean operators
-- Occupation filtering (by label or Wikidata ID)
-- Wikidata entity ID filtering
-- Pagination support
+- **Name Search**: Search by person name with full Boolean operator support and wildcards
+- **Occupation Filtering**: Filter by occupation label (e.g., "politician", "CEO", "actor") or Wikidata occupation IDs
+- **Wikidata Integration**: Filter by Wikidata entity IDs for precise identification
+- **Pagination**: Navigate results with configurable page size
+
+**Common Use Cases:**
+
+- Media monitoring for specific individuals
+- Building contact databases for PR and outreach
+- Research on public figures and their activities
+- Identifying experts and thought leaders in specific fields
+- Enriching CRM data with public figure information
 
 ### 🏢 Company
 
-Browse and search for companies tracked by Perigon.
+Search and discover companies with detailed business information and filtering options.
 
 **Operations:**
 
-- **Search**: Search companies by name, domain, ticker symbol, and more
+- **Search**: Find companies by name, domain, ticker symbol, industry, and various business attributes
 
-**Key Parameters:**
+**Key Features:**
 
-- Query search (name, domains, ticker symbols)
-- Country and domain filtering
-- Stock exchange filtering
-- Industry and sector filtering
-- Employee count range filtering
-- Ticker symbol filtering
+- **Query Search**: Search across company names, alternative names, domains, and ticker symbols
+- **Name-Specific Search**: Direct filtering by company name with Boolean operator support
+- **Geographic Filtering**: Filter by headquarters country
+- **Domain Filtering**: Filter by company website domains
+- **Stock Market Data**: Filter by stock exchange (NASDAQ, NYSE, etc.) and ticker symbols
+- **Industry Classification**: Filter by industry and sector with Boolean operators
+- **Company Size**: Filter by employee count ranges
+- **Direct ID Lookup**: Filter by specific company IDs
+- **Pagination**: Navigate results with configurable page size
+
+**Common Use Cases:**
+
+- Competitive intelligence and market research
+- Lead generation and prospecting
+- Investment research and due diligence
+- Building company databases for sales and marketing
+- Monitoring industry trends and company developments
 
 ### ✍️ Journalist
 
-Search through 230,000+ journalists from around the world.
+Search through over 230,000 journalists and reporters from around the world.
 
 **Operations:**
 
-- **Search**: Find journalists by name, publication, or coverage area
-- **Get by ID**: Retrieve detailed information about a specific journalist
+- **Search**: Find journalists by name, publication, coverage area, or activity level
+- **Get by ID**: Retrieve comprehensive details about a specific journalist using their unique identifier
 
-**Key Parameters:**
+**Key Features:**
 
-- Query search (name, title, Twitter bio)
-- Category and topic filtering
-- Country filtering
-- Source/publication filtering
-- Monthly post activity filtering
+- **Query Search**: Search across journalist names, titles, and Twitter biographies with Boolean operators
+- **Name-Specific Search**: Direct filtering by journalist name
+- **Coverage Filtering**: Filter by categories (Tech, Business, Politics, etc.) and granular topics
+- **Geographic Focus**: Filter by countries they commonly cover in their reporting
+- **Publication Filtering**: Filter by publisher domains and news sources
+- **Activity Metrics**: Filter by monthly posting activity (minimum and maximum thresholds)
+- **Direct ID Lookup**: Find specific journalists by their unique IDs
+- **Result Count**: Optional display of total matching journalists
+- **Pagination**: Navigate results with configurable page size (up to 1,000 per page)
+
+**Common Use Cases:**
+
+- Building media lists and PR contact databases
+- Finding subject matter experts for interviews
+- Monitoring journalist coverage and beats
+- Analyzing media landscape and journalist activity
+- Targeted outreach for press releases and stories
 
 ### 📡 Source
 
-Discover 142,000+ media sources and publications.
+Discover and analyze over 140,000 media sources and publications worldwide.
 
 **Operations:**
 
-- **Search**: Search and filter news sources
+- **Search**: Search and filter news sources with comprehensive criteria
 
-**Key Parameters:**
+**Key Features:**
 
-- Name search with Boolean operators
-- Domain filtering (supports wildcards)
-- Category and country filtering
-- Monthly visit statistics filtering
-- Paywall status filtering
-- Sort by relevance, global rank, monthly visits, or average monthly posts
+- **Name Search**: Search by source name with full Boolean operator support
+- **Domain Filtering**: Filter by publisher domains with wildcard support (e.g., `*.cnn.com`)
+- **Category Filtering**: Filter by primary content categories
+- **Geographic Filtering**: Filter by country coverage
+- **Traffic Metrics**: Filter by monthly visit ranges (minimum and maximum)
+- **Paywall Status**: Filter sources by paywall presence
+- **Source Groups**: Filter by predefined publisher bundles (e.g., "top100")
+- **Sorting Options**: Sort by relevance, global rank, monthly visits, or average monthly posts
+- **Result Count**: Optional display of total matching sources
+- **Pagination**: Navigate results with configurable page size
+
+**Common Use Cases:**
+
+- Building media monitoring source lists
+- Analyzing media landscape and publication reach
+- Identifying authoritative sources for specific topics
+- Filtering sources by audience size and engagement
+- Creating custom news feeds from trusted publications
 
 ### 🏷️ Topic
 
-Browse available topics in the Perigon database.
+Browse and discover topics available in the Perigon database for precise content filtering.
 
 **Operations:**
 
-- **Search**: Search through all available topics
+- **Search**: Search through all available topics with hierarchical filtering
 
-**Key Parameters:**
+**Key Features:**
 
-- Name search (exact or partial match)
-- Category and subcategory filtering
+- **Name Search**: Search topics by exact name or partial text match
+- **Category Filtering**: Filter topics by broad article categories (Tech, Business, Politics, etc.)
+- **Subcategory Filtering**: Filter by specific subcategories for granular topic discovery
+- **Pagination**: Navigate results with configurable page size
+
+**Common Use Cases:**
+
+- Discovering available topics for content filtering
+- Understanding topic taxonomy and structure
+- Building topic-based content categorization systems
+- Exploring related topics within categories
+- Creating targeted news feeds by topic
 
 ### 🤖 Summarize
 
-Generate AI-powered summaries of search results.
+Generate AI-powered summaries of news articles using state-of-the-art language models.
 
 **Operations:**
 
-- **Summarize**: Produce concise AI summaries over articles matching your filters
+- **Summarize**: Produce intelligent, concise summaries from articles matching your search criteria
 
-**Key Parameters:**
+**Key Features:**
 
-- Query for filtering articles
-- Custom prompt instructions (up to 2048 characters)
-- Model selection (GPT-4.1, GPT-4o, Llama 3.3 70B, DeepSeek R1, etc.)
-- Article count limits
-- Summarization method (articles or clusters)
-- Fields to summarize (title, content, summary)
-- All standard article filters (category, country, source, date range)
+- **Query Filtering**: Filter articles using Boolean operators before summarization
+- **Custom Prompts**: Provide detailed instructions (up to 2,048 characters) to guide summary generation
+- **Model Selection**: Choose from multiple leading AI models:
+  - GPT-4.1, GPT-4.1 Mini, GPT-4.1 Nano
+  - GPT-4o, GPT-4o Mini
+  - Llama 3.3 70B Versatile
+  - DeepSeek R1 Distill Llama 70B
+- **Article Limits**: Control the number of articles to include (max 100) and return
+- **Summarization Methods**:
+  - **ARTICLES**: Include all matching articles
+  - **CLUSTERS**: Select one representative article per story cluster
+- **Field Selection**: Choose which article fields to summarize (title, content, summary)
+- **Token Control**: Set maximum token limits for generated summaries
+- **Article Filtering**: Apply all standard filters (category, country, source, date range)
+
+**Common Use Cases:**
+
+- Automated news briefings and digests
+- Competitive intelligence reports
+- Market research summaries
+- Crisis monitoring and alerts
+- Content curation for newsletters
+- AI-powered research assistance
 
 ## Example Usage
 
@@ -256,24 +370,78 @@ Generate AI-powered summaries of search results.
    - Num Employees From: `1000`
 6. Run the workflow
 
-## Boolean Search Syntax
+### Find Journalist Contacts for PR Campaign
 
-Many search fields support advanced Boolean operators:
+1. Add the Perigon node
+2. Select **Journalist** as the resource
+3. Select **Search** as the operation
+4. Enter query: `technology reporter`
+5. In Additional Options:
+   - Category: `Tech`
+   - Min Monthly Posts: `5`
+   - Source: `techcrunch.com,theverge.com,wired.com`
+6. Run the workflow
+
+### Get Detailed Journalist Information
+
+1. Add the Perigon node
+2. Select **Journalist** as the resource
+3. Select **Get by ID** as the operation
+4. Enter the journalist ID (obtained from a previous search)
+5. Run the workflow to retrieve full profile details
+
+## AI Agent Compatibility
+
+This node is compatible with n8n's AI agent functionality (`usableAsTool: true`), allowing it to be used as a tool within AI agent workflows. This enables:
+
+- Dynamic news retrieval based on agent decisions
+- Automated research and fact-checking
+- Context-aware content generation
+- Multi-step information gathering workflows
+
+## Advanced Features
+
+### Boolean Search Syntax
+
+Many search fields support advanced Boolean operators for precise querying:
 
 - **AND**: Both terms must be present (e.g., `climate AND policy`)
 - **OR**: Either term can be present (e.g., `Biden OR Trump`)
 - **NOT**: Exclude terms (e.g., `energy NOT fossil`)
 - **Wildcards**: Use `*` for multiple characters, `?` for single character (e.g., `climat*`, `wom?n`)
-- **Grouping**: Use parentheses (e.g., `(renewable OR clean) AND energy`)
-- **Exact phrases**: Use quotes (e.g., `"climate change"`)
+- **Grouping**: Use parentheses to group terms (e.g., `(renewable OR clean) AND energy`)
+- **Exact Phrases**: Use double quotes for exact matching (e.g., `"climate change"`)
 
-Example: `("artificial intelligence" OR AI) AND (healthcare OR medical) NOT cryptocurrency`
+**Example Complex Query:**
+
+```
+("artificial intelligence" OR AI OR "machine learning") AND (healthcare OR medical) NOT cryptocurrency
+```
+
+### Semantic Vector Search
+
+Both Article and Wikipedia resources support vector search for semantic similarity matching:
+
+- Use natural language queries instead of keywords
+- Find conceptually related content even without exact keyword matches
+- Ideal for AI/LLM workflows and exploratory research
+- Better results for complex, multi-faceted queries
 
 ## Resources
 
-- [Perigon Website](https://www.goperigon.com/)
-- [Perigon API Documentation](https://docs.goperigon.com/)
-- [n8n Community Nodes Documentation](https://docs.n8n.io/integrations/community-nodes/)
+- **[Perigon Website](https://www.perigon.io/)** - Product information and pricing
+- **[API Documentation](https://www.perigon.io/docs)** - Complete API guides
+- **[API Reference](https://www.perigon.io/reference)** - Endpoint documentation
+- **[n8n Documentation](https://docs.n8n.io/)** - Learn about n8n workflows
+- **[Community Nodes](https://docs.n8n.io/integrations/community-nodes/)** - n8n community node information
+
+## Support
+
+For issues, questions, or feature requests:
+
+- **GitHub Issues**: [Report bugs or request features](https://github.com/goperigon/n8n-nodes-perigon/issues)
+- **Perigon Support**: Contact support@perigon.io
+- **n8n Community**: [Join the n8n community](https://community.n8n.io/)
 
 ## License
 
