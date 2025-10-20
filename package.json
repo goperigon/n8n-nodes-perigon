@@ -1,6 +1,6 @@
 {
 	"name": "@goperigon/n8n-nodes-perigon",
-	"version": "0.1.0",
+	"version": "0.1.3",
 	"description": "Official n8n community node for the Perigon API - Access AI-powered news articles, stories, companies, people, journalists, sources, topics, Wikipedia data, and AI-powered summarization",
 	"license": "MIT",
 	"homepage": "https://www.perigon.io",
