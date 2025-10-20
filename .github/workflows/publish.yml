@@ -44,11 +44,6 @@ jobs:
       - name: Update package version
         run: npm version ${{ inputs.version }} --no-git-tag-version
 
-      - name: Publish to NPM
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Commit and push version change
         run: |
           git add package.json package-lock.json
@@ -56,3 +51,8 @@ jobs:
           git tag v${{ inputs.version }}
           git push origin main
           git push origin v${{ inputs.version }}
+
+      - name: Publish to NPM
+        run: npm publish --access public --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

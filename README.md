@@ -13,13 +13,17 @@ Follow these steps to install this node in your n8n instance:
 3. Enter `n8n-nodes-perigon`
 4. Click **Install**
 
-Alternatively, you can install it using npm:
+Alternatively, you can install it using npm.
+
+## Documentation
+
+For complete documentation about the Perigon API and its capabilities, visit the [Docs](https://www.perigon.io/docs) or the [API Reference](https://www.perigon.io/reference) for more details.
 
 ## Credentials
 
 To use this node, you need a Perigon API key. You can get one by:
 
-1. Going to [Perigon's website](https://www.goperigon.com/)
+1. Going to [Perigon's website](https://www.perigon.io)
 2. Creating an account
 3. Getting your API key from the dashboard
 
