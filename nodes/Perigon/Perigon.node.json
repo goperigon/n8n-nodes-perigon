@@ -1,5 +1,5 @@
 {
-	"node": "n8n-nodes-perigon",
+	"node": "@goperigon/n8n-nodes-perigon",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Development", "Developer Tools", "AI", "Contextual Intelligence", "AI News", "News Data", "Wikipedia API", "News API"],
