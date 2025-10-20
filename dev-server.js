@@ -2,6 +2,10 @@
 
 /**
  * Development server script for n8n custom node
+ * This is used to link the custom node and run the n8n dev server
+ * since the n8n-node cli dev server is not properly working for some of our team members.
+ *
+ * THIS WAS HEAVILY INSPIRED BY: https://github.com/n8n-io/n8n/blob/14d9c20e02c81d384eabb19e381b435d434115ae/packages/%40n8n/node-cli/src/commands/dev/index.ts
  *
  * This script:
  * 1. Links the current node package globally

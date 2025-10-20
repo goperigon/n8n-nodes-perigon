@@ -1,6 +1,6 @@
 # n8n-nodes-perigon
 
-This is the official n8n community node for interacting with the Perigon API. It provides comprehensive access to news articles, stories, people, companies, journalists, sources, topics, Wikipedia data, and AI-powered summarization.
+This is the official n8n community node for interacting with the Perigon API. It provides comprehensive access to contextual intelligent APIs including vector articles search, news articles, stories, people, companies, journalists, sources, topics, Wikipedia data, and AI-powered summarization.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
