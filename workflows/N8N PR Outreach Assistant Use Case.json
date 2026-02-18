@@ -1,0 +1,246 @@
+{
+  "name": "N8N PR Outreach Assistant Use Case",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        80
+      ],
+      "id": "8c2f2873-5f3e-4cbb-8c7a-afc1e20f72e0",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "journalists",
+        "q": "(\"technology reporter\" OR \"AI reporter\" OR \"enterprise software\")",
+        "additionalOptions": {
+          "category": "Tech,Business",
+          "country": "us,gb,ca",
+          "minMonthlyPosts": 5,
+          "showNumResults": true,
+          "size": 40
+        },
+        "requestOptions": {}
+      },
+      "type": "@goperigon/n8n-nodes-perigon.perigon",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -48
+      ],
+      "id": "8fec4e77-292d-41f9-9460-0337521842fc",
+      "name": "Search Journalists",
+      "credentials": {
+        "perigonApi": {
+          "id": "zUSOCSBFRFeNV2am",
+          "name": "Perigon account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build and score outreach candidates from journalist search results.\nconst input = $input.first().json;\nconst journalists = Array.isArray(input.results)\n  ? input.results\n  : Array.isArray(input.data)\n    ? input.data\n    : Array.isArray(input.items)\n      ? input.items\n      : [];\n\nconst campaign = {\n  topic: \"AI product launch\",\n  targetRegion: [\"us\", \"gb\", \"ca\"],\n  categories: [\"Tech\", \"Business\"],\n  minMonthlyPosts: 5\n};\n\nconst normalizeDomain = (value) => {\n  if (!value || typeof value !== \"string\") return \"\";\n  return value\n    .replace(/^https?:\\/\\//, \"\")\n    .replace(/^www\\./, \"\")\n    .split(\"/\")[0]\n    .trim()\n    .toLowerCase();\n};\n\nconst candidates = journalists.map((j, idx) => {\n  const name = j?.name || j?.fullName || j?.journalistName || \"Unknown Journalist\";\n  const title = j?.title || j?.role || j?.position || \"Reporter\";\n\n  const firstSource = Array.isArray(j?.source) ? j.source[0] : j?.source;\n  const sourceDomain = normalizeDomain(\n    j?.sourceDomain ||\n    j?.domain ||\n    firstSource ||\n    (Array.isArray(j?.sources) ? j.sources[0] : \"\")\n  );\n\n  const monthlyPosts = Number(j?.monthlyPosts || j?.avgMonthlyPosts || 0);\n  const twitter = j?.twitter || j?.twitterHandle || j?.x || \"\";\n  const categories = Array.isArray(j?.category) ? j.category : [];\n  const topics = Array.isArray(j?.topic) ? j.topic : [];\n\n  // Simple explainable prioritization for outreach sequencing.\n  let score = 0;\n  if (monthlyPosts >= campaign.minMonthlyPosts) score += Math.min(25, monthlyPosts);\n  if (sourceDomain) score += 20;\n  if (twitter) score += 10;\n  if (categories.length > 0) score += 10;\n  if (topics.length > 0) score += 10;\n\n  return {\n    rank: idx + 1,\n    id: j?.id || j?.journalistId || \"\",\n    name,\n    title,\n    sourceDomain,\n    monthlyPosts,\n    twitter,\n    categories,\n    topics,\n    score,\n    pitchAngle: `Pitch ${campaign.topic} with emphasis on business impact and implementation details relevant to ${title.toLowerCase()}.`\n  };\n});\n\nconst topJournalists = candidates\n  .sort((a, b) => b.score - a.score)\n  .slice(0, 15);\n\nreturn {\n  campaign,\n  candidateCount: journalists.length,\n  topJournalists,\n  sourceDomains: [...new Set(topJournalists.map((j) => j.sourceDomain).filter(Boolean))].slice(0, 20),\n  generatedAt: new Date().toISOString()\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        112
+      ],
+      "id": "ec75ff57-8dc7-4735-bfec-d403132e0b00",
+      "name": "Score & Prioritize Journalists"
+    },
+    {
+      "parameters": {
+        "resource": "sources",
+        "name": "={{ ($json.sourceDomains || []).join(\" OR \") }}",
+        "additionalOptions": {
+          "domain": "={{ ($json.sourceDomains || []).join(\",\") }}",
+          "showNumResults": true,
+          "size": 20,
+          "sortBy": "monthlyVisits"
+        },
+        "requestOptions": {}
+      },
+      "type": "@goperigon/n8n-nodes-perigon.perigon",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -48
+      ],
+      "id": "b1362255-5ac5-4c60-8ff9-8d74b44b55bd",
+      "name": "Enrich Source Metadata",
+      "credentials": {
+        "perigonApi": {
+          "id": "zUSOCSBFRFeNV2am",
+          "name": "Perigon account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Assemble final outreach sheet-style payload.\nconst sourceResp = $input.first().json;\nconst journalistPayload = $items(\"Score & Prioritize Journalists\", 0, 0)?.[0]?.json ?? {};\n\nconst sourceRows = Array.isArray(sourceResp.results)\n  ? sourceResp.results\n  : Array.isArray(sourceResp.data)\n    ? sourceResp.data\n    : Array.isArray(sourceResp.items)\n      ? sourceResp.items\n      : [];\n\nconst sourceByDomain = new Map();\nfor (const s of sourceRows) {\n  const domain = (s?.domain || s?.name || \"\").toString().toLowerCase();\n  if (!domain) continue;\n  sourceByDomain.set(domain, {\n    name: s?.name || \"\",\n    domain: s?.domain || domain,\n    monthlyVisits: s?.monthlyVisits ?? null,\n    globalRank: s?.globalRank ?? null,\n    paywall: s?.paywall ?? null\n  });\n}\n\nconst outreachList = (journalistPayload.topJournalists || []).map((j, idx) => {\n  const source = sourceByDomain.get((j.sourceDomain || \"\").toLowerCase()) || null;\n  return {\n    priority: idx + 1,\n    journalistId: j.id,\n    journalistName: j.name,\n    title: j.title,\n    sourceDomain: j.sourceDomain,\n    monthlyPosts: j.monthlyPosts,\n    twitter: j.twitter,\n    categories: j.categories,\n    topics: j.topics,\n    score: j.score,\n    suggestedPitchAngle: j.pitchAngle,\n    sourceName: source?.name || \"\",\n    sourceMonthlyVisits: source?.monthlyVisits,\n    sourceGlobalRank: source?.globalRank,\n    sourcePaywall: source?.paywall\n  };\n});\n\nreturn {\n  workflow: \"PR Outreach Assistant\",\n  generatedAt: journalistPayload.generatedAt || new Date().toISOString(),\n  campaign: journalistPayload.campaign || {},\n  candidateCount: journalistPayload.candidateCount || 0,\n  outreachList\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        80
+      ],
+      "id": "511cd8bc-474b-4724-83aa-064fb8b7255f",
+      "name": "Format Outreach Output"
+    },
+    {
+      "parameters": {
+        "content": "# PR Outreach Assistant\nThis workflow helps PR/comms teams discover and prioritize relevant journalists for a campaign.\n\nFlow: Journalist discovery -> scoring -> source enrichment -> clean outreach list.\n\nRun manually first, then convert to a schedule once tuned.",
+        "height": 688,
+        "width": 496,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -784,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "8261b5f1-fbf7-4782-a5e8-46738c236f37",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 1) Trigger\nUse Manual Trigger while building/testing.\n\nFor production:\n- Replace with Schedule Trigger (daily/weekly)\n- Or use Webhook Trigger from forms/CRM\n\nTip: Keep one manual version for quick QA.",
+        "height": 320,
+        "width": 336
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -112,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "99ac4ed3-cc55-4815-bed9-f7f34a1e44da",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## 2) Search Journalists (Perigon)\nCore discovery step using journalists -> search.\n\nCustomize for your campaign:\n- q: your beat/topic keywords\n- category: e.g. Tech, Business, Politics\n- country: region targeting\n- minMonthlyPosts: writer activity threshold\n- size: how many candidates to fetch",
+        "height": 320,
+        "width": 336
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        160,
+        -416
+      ],
+      "typeVersion": 1,
+      "id": "5a6f40c0-e975-4a59-afce-c39e45a1e41e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## 3) Score & Prioritize (Code)\nBuilds ranked outreach candidates and pitch angles.\n\nHow to adapt:\n- Change campaign.topic\n- Update scoring logic (e.g. penalize low activity)\n- Add your own fields (language, publication tier, timezone)\n\nThis is where your team's outreach strategy lives.",
+        "height": 352,
+        "width": 368
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        400,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "51682a75-e1d2-4f76-a847-1d65d0256bc2",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## 4) Enrich Source Metadata (Perigon)\nLooks up source-level quality/context using sources -> search.\n\nUseful for prioritization:\n- monthlyVisits for reach\n- globalRank for authority proxy\n- paywall for access considerations\n\nYou can tune sortBy and size based on output volume.",
+        "height": 320,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        656,
+        -416
+      ],
+      "typeVersion": 1,
+      "id": "ae7bf4e4-7f8e-46ad-a059-d467cf5c2e77",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## 5) Format Outreach Output (Code)\nMerges journalist + source data into a final outreach list.\n\nTypical next steps:\n- Send to Google Sheets/Airtable\n- Push to CRM (HubSpot/Salesforce)\n- Post top targets to Slack\n\nAdd columns your team needs before exporting.",
+        "height": 320,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1312,
+        -32
+      ],
+      "typeVersion": 1,
+      "id": "25e73155-8904-4393-b79e-47d59ead3f73",
+      "name": "Sticky Note5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search Journalists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Journalists": {
+      "main": [
+        [
+          {
+            "node": "Score & Prioritize Journalists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score & Prioritize Journalists": {
+      "main": [
+        [
+          {
+            "node": "Enrich Source Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Source Metadata": {
+      "main": [
+        [
+          {
+            "node": "Format Outreach Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7e18a5b2-a62f-434e-afe8-d239cb20ae98",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f04443b375276b1468a67e9b4f487d676e28404aaa576e7ca7acca03bf0d8b35"
+  },
+  "id": "91tNhsChs1SxTgfu",
+  "tags": []
+}

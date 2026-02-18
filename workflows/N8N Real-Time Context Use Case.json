@@ -1,0 +1,340 @@
+{
+  "name": "N8N Real-Time Context Use Case",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -720,
+        -176
+      ],
+      "id": "cf6814a9-15b9-4286-a271-a72c1a295823",
+      "name": "When chat message received",
+      "webhookId": "3b3c96e9-4dae-4730-8540-13e90db08459"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-opus-4-6",
+          "mode": "list",
+          "cachedResultName": "Claude Opus 4.6"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        -128
+      ],
+      "id": "56e13fe4-b994-48ef-8ffc-1f6ebde84647",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "ljj7S3aaLdltZNZW",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        -112
+      ],
+      "id": "61b6027b-d00a-433f-9678-52485ced25b2",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -96,
+        -144
+      ],
+      "id": "2ee644a5-6fe2-41ca-a247-2b9ec0a2bac3",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "resource": "articles",
+        "operation": "vectorSearch",
+        "prompt": "={{ $json.chatInput }}",
+        "additionalOptions": {},
+        "advancedFilters": {},
+        "requestOptions": {}
+      },
+      "type": "@goperigon/n8n-nodes-perigon.perigon",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -384
+      ],
+      "id": "2dd9fcc7-e29f-41d5-9c17-632a0b059648",
+      "name": "Search articles using vector similarity",
+      "credentials": {
+        "perigonApi": {
+          "id": "tEUbQulvMOWB8ss5",
+          "name": "Perigon account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "//This is an example script that combines the original user's prompt/query with the retrieved context before sending it to the AI agent (LLM) for final output.\n\nconst perigonResults = $input.first().json.results;\nconst userPrompt = $input.last().json.chatInput\nlet context = '';\nfor (const [idx, item] of perigonResults.entries()) {\n  context += `Article ${idx}\\n`;\n  context += `Title: ${item.data.title}\\n`;\n  context += `Summary: ${item.data.summary}\\n`;\n  context += `URL: ${item.data.url}\\n`;\n  context += `Image URL: ${item.data.imageUrl}\\n`;\n  context += `Categories: ${item.data.categories.join(\", \")}\\n\\n`;\n}\n\nreturn { query: `User Prompt: ${userPrompt}\\n\\nCONTEXT RETRIEVED FOR THE USER'S PROMPT:\\n\\n${context}\\nEND CONTEXT` };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        -352
+      ],
+      "id": "6f7f2c05-1417-4899-9d2d-b5311869860f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        496,
+        -336
+      ],
+      "id": "b03e13ba-b700-47d1-bc92-f50d281d36f3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "content": "# Real-Time Context Assistant (Perigon + AI Agent)\nThis workflow enriches user chat prompts with live news context from Perigon before generating an LLM response.\n\nFlow:\nChat input -> vector search -> context assembly -> AI response with memory\n\nUse this when users need up-to-date, grounded answers.",
+        "height": 544,
+        "width": 512,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1344,
+        -384
+      ],
+      "typeVersion": 1,
+      "id": "289cdaec-f7ba-4c48-98b0-d0ab506b95dc",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 1) Chat Trigger\nStarts the workflow whenever a user sends a chat message.\n\nWhat it provides:\n- chatInput (the user's prompt)\n\nCustomize:\n- Connect to your preferred chat UI/channel\n- Add pre-validation or moderation before search if needed",
+        "height": 368,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -608,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "d4d65a60-440a-4313-910b-96032d9a4c32",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## 2) Search Articles Using Vector Similarity (Perigon)\nUses articles -> vectorSearch with the user's chat input as the semantic query.\n\nWhy this matters:\n- Finds conceptually relevant articles, not only keyword matches\n- Improves grounding for LLM outputs\n\nCustomize:\n- Add filters (category, country, source, topic, date range)\n- Adjust result size for quality vs token cost\n- Restrict to trusted source domains for reliability",
+        "height": 400,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        -816
+      ],
+      "typeVersion": 1,
+      "id": "68e49211-b60f-47ab-9d9f-c7a904a7f88a",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## 3) Merge Inputs\nCombines:\n- User chat payload\n- Perigon search results\n\nPurpose:\nKeeps both user intent and retrieved context available for downstream code/agent nodes.\n\nTip:\nIf changing node order or wiring, verify expected input indexes in the Code node.",
+        "height": 400,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -192,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "3a7891c8-2e5c-474c-9c7a-5cdfe9d0cd5f",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## 4) Build Context Prompt (Code)\nTransforms raw Perigon results into a structured context block for the AI Agent.\n\nCurrent behavior:\n- Iterates retrieved articles\n- Extracts title, summary, URL, image, categories\n- Creates one final query string with user prompt + context\n\nCustomize:\n- Limit top N articles to reduce tokens\n- Truncate long fields\n- Add confidence/source metadata\n- Add empty-results fallback message",
+        "height": 432,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        16,
+        -848
+      ],
+      "typeVersion": 1,
+      "id": "4187f9c6-7d39-482e-bca3-e51f56f7eab5",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## 5) AI Agent\nReceives the composed query and generates the final user-facing answer.\n\nBest practices:\n- Instruct the agent to cite sources from provided URLs\n- Tell the agent to say \"insufficient context\" when evidence is weak\n- Keep output format consistent (e.g., bullets, short answer + sources)",
+        "height": 240,
+        "width": 480
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        384,
+        -608
+      ],
+      "typeVersion": 1,
+      "id": "b4fcaa9e-2a25-41e3-9d12-195d5e40de8e",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## 6) Chat Model (Anthropic)\nProvides the language model used by the AI Agent.\n\nCustomize:\n- Swap model for speed/cost/quality tradeoff\n- Tune model options (temperature, max tokens) based on response style\n- Keep credentials scoped to the right workspace/environment",
+        "height": 400,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        304,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "61c3118b-3db0-4da5-99a7-bbb36ef2be78",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## 7) Simple Memory\nStores short conversation history for multi-turn continuity.\n\nUse carefully:\n- More memory improves continuity, but can increase token usage\n- Keep memory window aligned with your use case (support chat vs quick Q&A)\n- Consider privacy requirements before storing sensitive user context",
+        "height": 400,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "9728458e-afe9-4947-953a-608ed0f5dc72",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Setup Checklist\n1. Assign Perigon credentials on the Perigon node.\n2. Assign Anthropic credentials on the chat model node.\n3. Test with a few prompts (broad + niche + no-result query).\n4. Tune vector search filters and context size for quality/cost.\n5. Add guardrails in agent prompt (source citation + uncertainty handling).",
+        "height": 192,
+        "width": 736,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1456,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "d83fcd97-3cca-4da6-8b24-13222116dced",
+      "name": "Sticky Note8"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Search articles using vector similarity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search articles using vector similarity": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "17734f95-2634-4361-9250-2301357055bb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f04443b375276b1468a67e9b4f487d676e28404aaa576e7ca7acca03bf0d8b35"
+  },
+  "id": "BLahciBbepw7eZPX",
+  "tags": []
+}

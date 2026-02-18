@@ -1,0 +1,254 @@
+{
+  "name": "N8N Crisis Incident Monitoring Use Case",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "02bfdef2-7bd8-46fd-b05e-b0a9168839f1",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "stories",
+        "q": "(cyberattack OR ransomware OR outage OR \"data breach\" OR \"service disruption\")",
+        "additionalOptions": {
+          "category": "Tech,Business",
+          "country": "us,gb,ca",
+          "minUniqueSources": 3,
+          "showNumResults": true,
+          "size": 15,
+          "sortBy": "updatedAt"
+        },
+        "requestOptions": {}
+      },
+      "type": "@goperigon/n8n-nodes-perigon.perigon",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -144
+      ],
+      "id": "959c8b73-1fae-4d41-a056-4ec58e00f024",
+      "name": "Search Crisis Stories",
+      "credentials": {
+        "perigonApi": {
+          "id": "zUSOCSBFRFeNV2am",
+          "name": "Perigon account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build a robust summary query from the story search results.\nconst input = $input.first().json;\nconst stories = Array.isArray(input.results)\n  ? input.results\n  : Array.isArray(input.data)\n    ? input.data\n    : Array.isArray(input.items)\n      ? input.items\n      : [];\n\nconst topStories = stories.slice(0, 8).map((story, idx) => {\n  const name = story?.name || story?.title || story?.summary || `Story ${idx + 1}`;\n  const totalCount = story?.totalCount ?? story?.count ?? story?.articleCount ?? 0;\n  const uniqueSources = story?.uniqueSources ?? story?.sourceCount ?? 0;\n  return {\n    rank: idx + 1,\n    name,\n    totalCount,\n    uniqueSources\n  };\n});\n\nconst summaryQuery = topStories.length > 0\n  ? topStories.map((s) => `\"${s.name}\"`).join(\" OR \")\n  : \"cyberattack OR outage OR data breach\";\n\nreturn {\n  storyCount: stories.length,\n  topStories,\n  summaryQuery,\n  noStoriesFound: stories.length === 0,\n  generatedAt: new Date().toISOString()\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        0
+      ],
+      "id": "444a73fc-8e1e-4c2c-b437-3675c5011c26",
+      "name": "Build Crisis Query"
+    },
+    {
+      "parameters": {
+        "resource": "summarize",
+        "q": "={{ $json.summaryQuery }}",
+        "prompt": "You are generating an executive crisis monitoring brief. Write a concise summary with: (1) What is happening, (2) Potential business impact, (3) Geographic and industry signal, and (4) What to watch next. Use neutral language, avoid speculation, and keep it under 180 words.",
+        "additionalOptions": {
+          "category": "Tech,Business",
+          "country": "us,gb,ca",
+          "maxArticleCount": 30,
+          "method": "CLUSTERS",
+          "model": "gpt-4.1",
+          "returnedArticleCount": 8,
+          "summarizeFields": [
+            "TITLE",
+            "SUMMARY"
+          ]
+        },
+        "requestOptions": {}
+      },
+      "type": "@goperigon/n8n-nodes-perigon.perigon",
+      "typeVersion": 1,
+      "position": [
+        736,
+        -144
+      ],
+      "id": "b8e072e3-d3eb-47ce-ab81-e459eb3d5caa",
+      "name": "Generate Crisis Brief",
+      "credentials": {
+        "perigonApi": {
+          "id": "zUSOCSBFRFeNV2am",
+          "name": "Perigon account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Produce a final, easy-to-consume output payload for testing and downstream alerts.\nconst summaryOutput = $input.first().json;\nconst previous = $items(\"Build Crisis Query\", 0, 0)?.[0]?.json ?? {};\n\nconst finalSummary = summaryOutput?.summary || summaryOutput?.result?.summary || \"No summary text returned.\";\nconst returnedArticles = summaryOutput?.articles || summaryOutput?.result?.articles || [];\n\nreturn {\n  workflow: \"Crisis Incident Monitoring\",\n  generatedAt: previous.generatedAt || new Date().toISOString(),\n  storyCount: previous.storyCount ?? 0,\n  topStories: previous.topStories || [],\n  summary: finalSummary,\n  returnedArticleCount: Array.isArray(returnedArticles) ? returnedArticles.length : 0,\n  returnedArticles\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        0
+      ],
+      "id": "63f0fc65-d6bf-4b7b-8061-320941c0fce0",
+      "name": "Format Final Output"
+    },
+    {
+      "parameters": {
+        "content": "# Crisis / Incident Monitoring\nThis workflow detects emerging incidents from clustered stories and generates an executive brief.\n\nFlow: Story detection -> query builder -> AI summary -> final crisis payload.\n\nUse this for risk monitoring, comms prep, and incident-response awareness.",
+        "height": 720,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -768,
+        -336
+      ],
+      "typeVersion": 1,
+      "id": "a6318ec1-0e6e-4726-8298-79e1e12a2632",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 1) Trigger\nUse Manual Trigger for initial validation.\n\nFor production:\n- Replace with Schedule Trigger (e.g. every 15-60 min)\n- Add Slack/Email/PagerDuty after final output\n\nTip: Keep a manual test path for debugging.",
+        "height": 336,
+        "width": 368
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -208,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "e4030538-b279-4476-9f01-aa737ce7fefa",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## 2) Search Crisis Stories (Perigon)\nUses stories -> search to find multi-source incident clusters.\n\nCustomize:\n- q: your incident keywords\n- category/country: monitoring scope\n- minUniqueSources: confidence filter\n- size/sortBy: result volume and freshness\n\nHigher minUniqueSources reduces noise.",
+        "height": 336,
+        "width": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        48,
+        -528
+      ],
+      "typeVersion": 1,
+      "id": "70fe471a-c0f7-4ce8-a398-3da90d1789d8",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## 3) Build Crisis Query (Code)\nTransforms top story clusters into a robust summary query.\n\nWhat it does:\n- Normalizes story list from API response\n- Selects top stories\n- Builds OR-based summary query\n- Adds fallback query when results are empty\n\nCustomize fallback terms and top-story count as needed.",
+        "height": 336,
+        "width": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        336,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "bb88ba9d-710e-43ca-956b-106aba935798",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## 4) Generate Crisis Brief (Perigon Summarize)\nUses summarize -> summarize to produce an executive incident brief.\n\nCustomize:\n- prompt tone/format (exec brief vs analyst brief)\n- method (CLUSTERS vs ARTICLES)\n- model, maxArticleCount, returnedArticleCount\n- category/country for tighter relevance",
+        "height": 336,
+        "width": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        592,
+        -528
+      ],
+      "typeVersion": 1,
+      "id": "71120b6d-f9f7-4df0-88cc-c0feec8c5f86",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## 5) Format Final Output (Code)\nProduces a clean payload for downstream systems.\n\nIncludes:\n- storyCount and topStories\n- generated summary\n- returned article metadata\n\nConnect this output to Slack, email digests, ticketing, or dashboards.",
+        "height": 336,
+        "width": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1248,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "a2c48e0e-51cb-42a6-b2ce-af0add315b0a",
+      "name": "Sticky Note5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search Crisis Stories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Crisis Stories": {
+      "main": [
+        [
+          {
+            "node": "Build Crisis Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Crisis Query": {
+      "main": [
+        [
+          {
+            "node": "Generate Crisis Brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Crisis Brief": {
+      "main": [
+        [
+          {
+            "node": "Format Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "965c5a59-a707-4acc-9b62-ed3a421ec0c1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f04443b375276b1468a67e9b4f487d676e28404aaa576e7ca7acca03bf0d8b35"
+  },
+  "id": "HSaStscT5B73GRwd",
+  "tags": []
+}
