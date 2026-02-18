@@ -21,6 +21,29 @@ Alternatively, you can install it using npm:
 npm install @goperigon/n8n-nodes-perigon
 ```
 
+## Example Workflow Templates (Import into n8n)
+
+You can download ready-to-use workflow templates from this repository and import them directly into your n8n workspace:
+
+- **[N8N Real-Time Context Use Case](./workflows/N8N%20Real-Time%20Context%20Use%20Case.json)**
+- **[N8N PR Outreach Assistant Use Case](./workflows/N8N%20PR%20Outreach%20Assistant%20Use%20Case.json)**
+- **[N8N Crisis Incident Monitoring Use Case](./workflows/N8N%20Crisis%20Incident%20Monitoring%20Use%20Case.json)**
+
+### Download the workflow JSON files
+
+You can download each workflow in either of these ways:
+
+1. Open a workflow link above
+2. Click **Download raw file** (or **Raw**), then save the `.json` file locally
+
+### Import into your n8n workspace
+
+1. In n8n, go to **Workflows**
+2. Click **Import from File**
+3. Select the downloaded `.json` workflow file
+4. Review credentials and node settings
+5. Save and activate the workflow
+
 ## Documentation
 
 For complete documentation about the Perigon API and its capabilities, visit:
